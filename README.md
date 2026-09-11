@@ -14,6 +14,10 @@ A tiny cross-platform desktop app for compressing videos, built with [Wails](htt
 
 Squish doesn't reimplement video codecs — like every tool in this space, it shells out to the `ffmpeg`/`ffprobe` binaries on your machine and wraps them in a native GUI. The Go backend (`app.go`) builds the ffmpeg command from your chosen settings, parses `-progress` output for the progress bar, and exposes everything to a small vanilla HTML/JS frontend via Wails bindings.
 
+## Download
+
+Prebuilt binaries for Windows, macOS, and Linux are attached to each [GitHub release](https://github.com/freeb5d/squish/releases). Pushing a tag like `v1.1.0` triggers CI (`.github/workflows/build.yml`) to build all three platforms and publish them automatically.
+
 ## Prerequisites
 
 - [Go](https://go.dev/dl/) 1.21+
