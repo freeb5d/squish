@@ -1,8 +1,8 @@
-/build
-*.exe
+/build/bin
+/squish.exe
+/squish
 *.dll
 *.dylib
-*.app
 .DS_Store
 node_modules/
 /frontend/wailsjs/

@@ -9,5 +9,12 @@
   "author": {
     "name": "",
     "email": ""
+  },
+  "info": {
+    "companyName": "Squish",
+    "productName": "Squish",
+    "productVersion": "1.0.1",
+    "copyright": "",
+    "comments": "Drop a video, shrink it, done."
   }
 }
