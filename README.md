@@ -38,7 +38,8 @@ before you even hit compress.
 ## Screenshot
 
 <div align="center">
-<img src="docs/screenshot.png" width="640" alt="Squish app window" />
+<img src="docs/screenshot-empty.png" width="400" alt="Squish drop zone" />
+<img src="docs/screenshot.png" width="400" alt="Squish settings panel with live size estimate" />
 </div>
 
 ## Download
