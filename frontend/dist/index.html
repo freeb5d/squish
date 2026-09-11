@@ -8,9 +8,24 @@
 <body>
   <div id="app">
     <header>
-      <h1>Squish</h1>
-      <p class="subtitle">Drop a video, shrink it, done.</p>
+      <div class="header-row">
+        <div>
+          <h1>Squish</h1>
+          <p class="subtitle">Drop a video, shrink it, done.</p>
+        </div>
+        <button id="theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+          <span id="theme-icon">&#9789;</span>
+        </button>
+      </div>
     </header>
+
+    <div id="update-banner" class="update-banner hidden">
+      <span id="update-text"></span>
+      <div class="update-actions">
+        <button id="update-view-btn" class="link-btn">View release</button>
+        <button id="update-dismiss-btn" class="icon-btn small" aria-label="Dismiss">&times;</button>
+      </div>
+    </div>
 
     <main>
       <section id="drop-zone" class="drop-zone">
@@ -29,7 +44,7 @@
         </div>
 
         <div class="field">
-          <label for="quality">Quality <span id="quality-value">28</span> (lower = better quality, larger file)</label>
+          <label for="quality">Quality <span id="quality-value">28</span> <span class="hint">(lower = better quality, larger file)</span></label>
           <input type="range" id="quality" min="18" max="40" value="28" />
         </div>
 
@@ -48,6 +63,11 @@
             <input type="checkbox" id="remove-audio" />
             Remove audio
           </label>
+        </div>
+
+        <div class="estimate">
+          <span id="estimate-size">Estimated size: —</span>
+          <span id="estimate-quality" class="estimate-quality"></span>
         </div>
 
         <button id="compress-btn" class="primary-btn">Compress</button>
@@ -71,6 +91,11 @@
 
       <p id="error-text" class="error-text hidden"></p>
     </main>
+
+    <footer class="app-footer">
+      <span id="app-version">Squish</span>
+      <button id="github-link" class="link-btn">GitHub</button>
+    </footer>
   </div>
 
   <script src="main.js"></script>

@@ -38,6 +38,7 @@ type VideoInfo struct {
 	VideoCodec string  `json:"videoCodec"`
 	AudioCodec string  `json:"audioCodec"`
 	BitrateKbs int     `json:"bitrateKbps"`
+	FPS        float64 `json:"fps"`
 }
 
 // CompressOptions mirrors the settings a user picks in the UI.
@@ -115,6 +116,7 @@ func (a *App) GetVideoInfo(path string) (*VideoInfo, error) {
 		"-show_format", "-show_streams",
 		path,
 	)
+	hideWindow(cmd)
 	out, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("ffprobe failed (is ffmpeg/ffprobe installed and on PATH?): %w", err)
@@ -126,10 +128,11 @@ func (a *App) GetVideoInfo(path string) (*VideoInfo, error) {
 			BitRate  string `json:"bit_rate"`
 		} `json:"format"`
 		Streams []struct {
-			CodecType string `json:"codec_type"`
-			CodecName string `json:"codec_name"`
-			Width     int    `json:"width"`
-			Height    int    `json:"height"`
+			CodecType   string `json:"codec_type"`
+			CodecName   string `json:"codec_name"`
+			Width       int    `json:"width"`
+			Height      int    `json:"height"`
+			RFrameRate  string `json:"r_frame_rate"`
 		} `json:"streams"`
 	}
 	if err := json.Unmarshal(out, &probe); err != nil {
@@ -153,12 +156,28 @@ func (a *App) GetVideoInfo(path string) (*VideoInfo, error) {
 			info.Width = s.Width
 			info.Height = s.Height
 			info.VideoCodec = s.CodecName
+			info.FPS = parseFrameRate(s.RFrameRate)
 		case "audio":
 			info.AudioCodec = s.CodecName
 		}
 	}
 
 	return info, nil
+}
+
+// parseFrameRate converts ffprobe's "num/den" frame rate (e.g. "30000/1001")
+// into a float. Returns 0 on anything unparseable.
+func parseFrameRate(s string) float64 {
+	parts := strings.SplitN(s, "/", 2)
+	if len(parts) != 2 {
+		return 0
+	}
+	num, err1 := strconv.ParseFloat(parts[0], 64)
+	den, err2 := strconv.ParseFloat(parts[1], 64)
+	if err1 != nil || err2 != nil || den == 0 {
+		return 0
+	}
+	return num / den
 }
 
 // CompressVideo runs ffmpeg with the given options, emitting "compress:progress"
@@ -220,6 +239,7 @@ func (a *App) CompressVideo(opts CompressOptions) (*CompressResult, error) {
 	args = append(args, "-progress", "pipe:1", "-nostats", opts.OutputPath)
 
 	cmd := exec.Command(ffmpegBinary(), args...)
+	hideWindow(cmd)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err

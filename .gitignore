@@ -1,7 +1,8 @@
-/build/bin
+/build
 *.exe
 *.dll
 *.dylib
 *.app
 .DS_Store
 node_modules/
+/frontend/wailsjs/
