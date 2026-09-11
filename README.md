@@ -1,6 +1,6 @@
 # Squish
 
-A tiny cross-platform desktop app for compressing videos, built with [Wails](https://wails.io) (Go backend) and FFmpeg. Inspired by [compressO](https://github.com/codeforreal1/compressO).
+A tiny cross-platform desktop app for compressing videos, built with [Wails](https://wails.io) (Go backend) and FFmpeg.
 
 ## Features
 
