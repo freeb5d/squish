@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Squish</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Squish</h1>
+      <p class="subtitle">Drop a video, shrink it, done.</p>
+    </header>
+
+    <main>
+      <section id="drop-zone" class="drop-zone">
+        <p id="drop-text">Click to choose a video, or drag one here</p>
+        <p id="file-info" class="file-info hidden"></p>
+      </section>
+
+      <section id="settings" class="settings hidden">
+        <div class="field">
+          <label for="format">Format</label>
+          <select id="format">
+            <option value="mp4">MP4 (H.264)</option>
+            <option value="mp4-h265">MP4 (H.265 / smaller)</option>
+            <option value="webm">WebM (VP9)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="quality">Quality <span id="quality-value">28</span> (lower = better quality, larger file)</label>
+          <input type="range" id="quality" min="18" max="40" value="28" />
+        </div>
+
+        <div class="field">
+          <label for="scale">Resolution</label>
+          <select id="scale">
+            <option value="100">Original</option>
+            <option value="75">75%</option>
+            <option value="50">50%</option>
+            <option value="25">25%</option>
+          </select>
+        </div>
+
+        <div class="field checkbox-field">
+          <label>
+            <input type="checkbox" id="remove-audio" />
+            Remove audio
+          </label>
+        </div>
+
+        <button id="compress-btn" class="primary-btn">Compress</button>
+      </section>
+
+      <section id="progress-section" class="progress-section hidden">
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <p id="progress-text">0%</p>
+      </section>
+
+      <section id="result-section" class="result-section hidden">
+        <h2>Done</h2>
+        <p id="result-summary"></p>
+        <div class="result-actions">
+          <button id="open-folder-btn">Show in folder</button>
+          <button id="reset-btn">Compress another</button>
+        </div>
+      </section>
+
+      <p id="error-text" class="error-text hidden"></p>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

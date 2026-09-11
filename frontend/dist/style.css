@@ -1,0 +1,202 @@
+:root {
+  color-scheme: dark;
+  --bg: #14161a;
+  --panel: #1d2026;
+  --border: #2b2f38;
+  --text: #e7e9ee;
+  --muted: #9099a8;
+  --accent: #6c8cff;
+  --accent-hover: #7d9bff;
+  --danger: #ff6b6b;
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.subtitle {
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: var(--accent);
+  background: rgba(108, 140, 255, 0.06);
+}
+
+#drop-text {
+  margin: 0;
+  color: var(--muted);
+}
+
+.file-info {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.hidden { display: none !important; }
+
+.settings {
+  margin-top: 24px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.field {
+  margin-bottom: 18px;
+}
+
+.field:last-of-type {
+  margin-bottom: 0;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field select,
+.field input[type="range"] {
+  width: 100%;
+}
+
+.field select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.checkbox-field label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.checkbox-field input { width: auto; }
+
+.primary-btn {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--accent);
+  color: #0d0f13;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.primary-btn:hover { background: var(--accent-hover); }
+.primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.progress-section {
+  margin-top: 24px;
+}
+
+.progress-bar {
+  height: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+#progress-text {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.result-section {
+  margin-top: 24px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.result-section h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: #7fe0a5;
+}
+
+#result-summary {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.result-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.result-actions button {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.result-actions button:hover { border-color: var(--accent); }
+
+.error-text {
+  margin-top: 20px;
+  color: var(--danger);
+  font-size: 14px;
+  text-align: center;
+}

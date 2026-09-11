@@ -1,0 +1,7 @@
+/build/bin
+*.exe
+*.dll
+*.dylib
+*.app
+.DS_Store
+node_modules/
