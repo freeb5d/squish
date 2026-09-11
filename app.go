@@ -193,8 +193,13 @@ func (a *App) CompressVideo(opts CompressOptions) (*CompressResult, error) {
 	if preset == "" {
 		preset = "medium"
 	}
-	if vcodec == "libx264" || vcodec == "libx265" {
+	switch vcodec {
+	case "libx264", "libx265":
 		args = append(args, "-preset", preset)
+	case "libvpx-vp9":
+		// VP9 only honors -crf in constant-quality mode when paired with -b:v 0;
+		// otherwise it silently falls back to a default bitrate target.
+		args = append(args, "-b:v", "0")
 	}
 
 	if opts.ScalePct > 0 && opts.ScalePct < 100 {
@@ -205,6 +210,9 @@ func (a *App) CompressVideo(opts CompressOptions) (*CompressResult, error) {
 
 	if opts.RemoveAudio {
 		args = append(args, "-an")
+	} else if vcodec == "libvpx-vp9" {
+		// WebM containers only accept Vorbis/Opus audio, not AAC.
+		args = append(args, "-c:a", "libopus", "-b:a", "128k")
 	} else {
 		args = append(args, "-c:a", "aac", "-b:a", "128k")
 	}
