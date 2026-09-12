@@ -65,6 +65,7 @@ function initLanguage() {
     const li = document.createElement("li");
     li.className = "lang-option";
     li.dataset.lang = code;
+    li.lang = code;
     li.setAttribute("role", "option");
     li.innerHTML =
       '<span>' + I18N[code].name + '</span>' +

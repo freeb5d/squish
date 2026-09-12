@@ -192,7 +192,8 @@ header { margin-bottom: 8px; }
 html[lang="fa"] body,
 html[lang="fa"] input,
 html[lang="fa"] select,
-html[lang="fa"] button {
+html[lang="fa"] button,
+[lang="fa"] {
   font-family: "Vazirmatn", -apple-system, "Segoe UI", Tahoma, sans-serif;
 }
 

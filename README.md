@@ -39,7 +39,7 @@ binary and extracted automatically on first run.
 | 📐 **Resolution scaling** | Original, 75%, 50%, 25% |
 | 🔇 **Audio** | Keep, or strip it entirely |
 | 📊 **Live estimate** | Predicted output size and quality before you compress |
-| 🌍 **8 languages** | English, فارسی, العربية, 简体中文, Русский, Français, Deutsch, Te Reo Māori — full RTL support for Persian and Arabic |
+| 🌍 **10 languages** | English, فارسی, العربية, 简体中文, Русский, Français, Deutsch, Te Reo Māori, Español, Português — full RTL support for Persian and Arabic |
 | 🌗 **Theming** | Light / dark, remembers your choice |
 | 🔄 **In-app updates** | Checks GitHub for new releases and installs them with a live progress bar (%, speed) — no manual download |
 | 🖱️ **Drag & drop** | Or use the native file picker |
