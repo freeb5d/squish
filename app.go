@@ -65,12 +65,20 @@ func ffmpegBinary() string {
 	if p := os.Getenv("FFMPEG_PATH"); p != "" {
 		return p
 	}
+	ensureBundledTools()
+	if bundledFFmpegPath != "" {
+		return bundledFFmpegPath
+	}
 	return "ffmpeg"
 }
 
 func ffprobeBinary() string {
 	if p := os.Getenv("FFPROBE_PATH"); p != "" {
 		return p
+	}
+	ensureBundledTools()
+	if bundledFFprobePath != "" {
+		return bundledFFprobePath
 	}
 	return "ffprobe"
 }

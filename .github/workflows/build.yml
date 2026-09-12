@@ -46,6 +46,38 @@ jobs:
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.15.0
 
+      - name: Download bundled FFmpeg (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip" -OutFile ffmpeg.zip
+          Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg_extract -Force
+          $bin = Get-ChildItem -Path ffmpeg_extract -Recurse -Filter ffmpeg.exe | Select-Object -First 1
+          $dir = Split-Path $bin.FullName
+          Copy-Item "$dir\ffmpeg.exe" resources\ffmpeg\windows\ffmpeg.exe -Force
+          Copy-Item "$dir\ffprobe.exe" resources\ffmpeg\windows\ffprobe.exe -Force
+
+      - name: Download bundled FFmpeg (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -L -o ffmpeg.tar.xz https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+          mkdir -p ffmpeg_extract
+          tar -xf ffmpeg.tar.xz -C ffmpeg_extract --strip-components=1
+          cp ffmpeg_extract/ffmpeg resources/ffmpeg/linux/ffmpeg
+          cp ffmpeg_extract/ffprobe resources/ffmpeg/linux/ffprobe
+          chmod +x resources/ffmpeg/linux/ffmpeg resources/ffmpeg/linux/ffprobe
+
+      - name: Download bundled FFmpeg (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          curl -L -o ffmpeg.zip https://evermeet.cx/ffmpeg/getrelease/zip
+          curl -L -o ffprobe.zip https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip
+          unzip -o ffmpeg.zip -d ffmpeg_extract
+          unzip -o ffprobe.zip -d ffprobe_extract
+          cp ffmpeg_extract/ffmpeg resources/ffmpeg/darwin/ffmpeg
+          cp ffprobe_extract/ffprobe resources/ffmpeg/darwin/ffprobe
+          chmod +x resources/ffmpeg/darwin/ffmpeg resources/ffmpeg/darwin/ffprobe
+
       - name: Build
         run: wails build -platform ${{ matrix.platform }} -clean
 

@@ -10,48 +10,63 @@
     <header>
       <div class="header-row">
         <div>
-          <h1>Squish</h1>
-          <p class="subtitle">Drop a video, shrink it, done.</p>
+          <h1 data-i18n="appTitle">Squish</h1>
+          <p class="subtitle" data-i18n="appSubtitle">Drop a video, shrink it, done.</p>
         </div>
-        <button id="theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
-          <span id="theme-icon">&#9789;</span>
-        </button>
+        <div class="header-toolbar">
+          <div class="lang-menu">
+            <button id="language-button" class="toolbar-btn lang-btn" aria-label="Language" aria-haspopup="listbox" aria-expanded="false">
+              <svg class="hdr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M2 12h20"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/>
+              </svg>
+              <span id="language-current"></span>
+              <svg class="hdr-icon chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </button>
+            <ul id="language-list" class="lang-list hidden" role="listbox"></ul>
+          </div>
+          <span class="toolbar-divider"></span>
+          <button id="theme-toggle" class="toolbar-btn theme-btn" title="Toggle theme" aria-label="Toggle theme">
+            <svg id="icon-sun" class="hdr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+            <svg id="icon-moon" class="hdr-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
-    <div id="update-banner" class="update-banner hidden">
-      <span id="update-text"></span>
-      <div class="update-actions">
-        <button id="update-view-btn" class="link-btn">View release</button>
-        <button id="update-dismiss-btn" class="icon-btn small" aria-label="Dismiss">&times;</button>
-      </div>
-    </div>
-
     <main>
       <section id="drop-zone" class="drop-zone">
-        <p id="drop-text">Click to choose a video, or drag one here</p>
+        <p id="drop-text" data-i18n="dropText">Click to choose a video, or drag one here</p>
         <p id="file-info" class="file-info hidden"></p>
       </section>
 
       <section id="settings" class="settings hidden">
         <div class="field">
-          <label for="format">Format</label>
+          <label for="format" data-i18n="formatLabel">Format</label>
           <select id="format">
-            <option value="mp4">MP4 (H.264)</option>
-            <option value="mp4-h265">MP4 (H.265 / smaller)</option>
-            <option value="webm">WebM (VP9)</option>
+            <option value="mp4" data-i18n="formatMp4H264">MP4 (H.264)</option>
+            <option value="mp4-h265" data-i18n="formatMp4H265">MP4 (H.265 / smaller)</option>
+            <option value="webm" data-i18n="formatWebm">WebM (VP9)</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="quality">Quality <span id="quality-value">28</span> <span class="hint">(lower = better quality, larger file)</span></label>
+          <label for="quality"><span data-i18n="qualityLabel">Quality</span> <span id="quality-value">28</span> <span class="hint" data-i18n="qualityHint">(lower = better quality, larger file)</span></label>
           <input type="range" id="quality" min="18" max="40" value="28" />
         </div>
 
         <div class="field">
-          <label for="scale">Resolution</label>
+          <label for="scale" data-i18n="resolutionLabel">Resolution</label>
           <select id="scale">
-            <option value="100">Original</option>
+            <option value="100" data-i18n="resolutionOriginal">Original</option>
             <option value="75">75%</option>
             <option value="50">50%</option>
             <option value="25">25%</option>
@@ -61,7 +76,7 @@
         <div class="field checkbox-field">
           <label>
             <input type="checkbox" id="remove-audio" />
-            Remove audio
+            <span data-i18n="removeAudioLabel">Remove audio</span>
           </label>
         </div>
 
@@ -70,7 +85,7 @@
           <span id="estimate-quality" class="estimate-quality"></span>
         </div>
 
-        <button id="compress-btn" class="primary-btn">Compress</button>
+        <button id="compress-btn" class="primary-btn" data-i18n="compressBtn">Compress</button>
       </section>
 
       <section id="progress-section" class="progress-section hidden">
@@ -81,11 +96,11 @@
       </section>
 
       <section id="result-section" class="result-section hidden">
-        <h2>Done</h2>
+        <h2 data-i18n="resultDoneTitle">Done</h2>
         <p id="result-summary"></p>
         <div class="result-actions">
-          <button id="open-folder-btn">Show in folder</button>
-          <button id="reset-btn">Compress another</button>
+          <button id="open-folder-btn" data-i18n="showInFolder">Show in folder</button>
+          <button id="reset-btn" data-i18n="compressAnother">Compress another</button>
         </div>
       </section>
 
@@ -93,11 +108,55 @@
     </main>
 
     <footer class="app-footer">
-      <span id="app-version">Squish</span>
-      <button id="github-link" class="link-btn">GitHub</button>
+      <button id="about-btn" class="link-btn about-btn">
+        <span data-i18n="aboutLabel">About</span>
+        <span id="about-update-dot" class="update-dot hidden"></span>
+      </button>
+      <button id="github-link" class="link-btn" data-i18n="githubLabel">GitHub</button>
     </footer>
   </div>
 
+  <div id="about-overlay" class="modal-overlay hidden">
+    <div class="modal-box">
+      <button id="about-close" class="icon-btn small modal-close" aria-label="Close">&times;</button>
+
+      <div class="about-app-row">
+        <img src="appicon.png" class="about-icon" alt="" />
+        <div>
+          <div class="about-name" data-i18n="appTitle">Squish</div>
+          <div id="about-version" class="about-version">v1.0.2</div>
+        </div>
+      </div>
+
+      <div id="update-idle-row" class="update-row">
+        <span id="update-status-text" data-i18n="upToDate">You're up to date.</span>
+        <button id="check-update-btn" class="link-btn" data-i18n="checkForUpdates">Check for updates</button>
+      </div>
+
+      <div id="update-available-row" class="update-row hidden">
+        <span id="update-available-text"></span>
+        <button id="update-now-btn" class="primary-btn small" data-i18n="updateNowBtn">Update now</button>
+      </div>
+
+      <div id="update-progress-row" class="update-progress-row hidden">
+        <div id="update-progress-label" class="update-progress-label" data-i18n="downloadingUpdate">Downloading update…</div>
+        <div class="progress-bar">
+          <div id="update-progress-fill" class="progress-fill"></div>
+        </div>
+        <div class="update-progress-meta">
+          <span id="update-progress-pct">0%</span>
+          <span id="update-progress-speed"></span>
+        </div>
+      </div>
+
+      <p id="update-error-text" class="error-text hidden"></p>
+
+      <button id="about-github-link" class="link-btn about-github-link" data-i18n="githubLabel">GitHub</button>
+      <p class="made-with-love" data-i18n="madeWithLove">Made with ❤️ by Kaveh</p>
+    </div>
+  </div>
+
+  <script src="i18n.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

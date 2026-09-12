@@ -1,18 +1,109 @@
 const themeToggle = document.getElementById("theme-toggle");
-const themeIcon = document.getElementById("theme-icon");
-const appVersionEl = document.getElementById("app-version");
+const iconSun = document.getElementById("icon-sun");
+const iconMoon = document.getElementById("icon-moon");
 const githubLinkBtn = document.getElementById("github-link");
-const updateBanner = document.getElementById("update-banner");
-const updateText = document.getElementById("update-text");
-const updateViewBtn = document.getElementById("update-view-btn");
-const updateDismissBtn = document.getElementById("update-dismiss-btn");
+const languageButton = document.getElementById("language-button");
+const languageCurrent = document.getElementById("language-current");
+const languageList = document.getElementById("language-list");
+
+const aboutBtn = document.getElementById("about-btn");
+const aboutUpdateDot = document.getElementById("about-update-dot");
+const aboutOverlay = document.getElementById("about-overlay");
+const aboutClose = document.getElementById("about-close");
+const aboutVersionEl = document.getElementById("about-version");
+const aboutGithubLink = document.getElementById("about-github-link");
+const updateIdleRow = document.getElementById("update-idle-row");
+const updateStatusText = document.getElementById("update-status-text");
+const checkUpdateBtn = document.getElementById("check-update-btn");
+const updateAvailableRow = document.getElementById("update-available-row");
+const updateAvailableText = document.getElementById("update-available-text");
+const updateNowBtn = document.getElementById("update-now-btn");
+const updateProgressRow = document.getElementById("update-progress-row");
+const updateProgressLabel = document.getElementById("update-progress-label");
+const updateProgressFill = document.getElementById("update-progress-fill");
+const updateProgressPct = document.getElementById("update-progress-pct");
+const updateProgressSpeed = document.getElementById("update-progress-speed");
+const updateErrorText = document.getElementById("update-error-text");
 
 let githubUrl = "";
-let latestReleaseUrl = "";
+let currentLang = "en";
+let appVersionNumber = "";
+
+function applyLanguage(lang) {
+  if (!I18N[lang]) lang = "en";
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = I18N[lang].dir;
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    el.textContent = t(lang, key);
+  });
+  if (appVersionNumber) {
+    aboutVersionEl.textContent = `v${appVersionNumber}`;
+  }
+  try {
+    localStorage.setItem("squish-lang", lang);
+  } catch (e) {
+    /* ignore */
+  }
+  languageCurrent.textContent = lang.toUpperCase();
+  languageList.querySelectorAll(".lang-option").forEach((el) => {
+    el.classList.toggle("active", el.dataset.lang === lang);
+  });
+  if (typeof updateEstimate === "function") updateEstimate();
+  if (typeof refreshResultSummary === "function") refreshResultSummary();
+  if (typeof renderUpdateRows === "function") renderUpdateRows();
+}
+
+function closeLanguageList() {
+  languageList.classList.add("hidden");
+  languageButton.setAttribute("aria-expanded", "false");
+}
+
+function initLanguage() {
+  SUPPORTED_LANGS.forEach((code) => {
+    const li = document.createElement("li");
+    li.className = "lang-option";
+    li.dataset.lang = code;
+    li.setAttribute("role", "option");
+    li.innerHTML =
+      '<span>' + I18N[code].name + '</span>' +
+      '<svg class="check" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>';
+    li.addEventListener("click", () => {
+      applyLanguage(code);
+      closeLanguageList();
+    });
+    languageList.appendChild(li);
+  });
+  applyLanguage(detectInitialLang());
+}
+
+languageButton.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const isHidden = languageList.classList.contains("hidden");
+  if (isHidden) {
+    languageList.classList.remove("hidden");
+    languageButton.setAttribute("aria-expanded", "true");
+  } else {
+    closeLanguageList();
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (!languageList.classList.contains("hidden") && !e.target.closest(".lang-menu")) {
+    closeLanguageList();
+  }
+});
 
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
-  themeIcon.textContent = theme === "dark" ? "☀" : "☽";
+  // Icon shows what clicking will switch you TO, matching the old glyph
+  // convention: sun visible in dark mode (click for light), moon visible
+  // in light mode (click for dark).
+  iconSun.classList.toggle("hidden", theme !== "dark");
+  iconMoon.classList.toggle("hidden", theme === "dark");
   try {
     localStorage.setItem("squish-theme", theme);
   } catch (e) {
@@ -42,26 +133,67 @@ themeToggle.addEventListener("click", () => {
 
 initTheme();
 
+let latestUpdateInfo = null;
+let updateInProgress = false;
+
 async function initFooterAndUpdates() {
   try {
     const info = await window.go.main.App.GetAppInfo();
     githubUrl = info.githubUrl;
-    appVersionEl.textContent = `Squish v${info.version}`;
+    appVersionNumber = info.version;
+    aboutVersionEl.textContent = `v${info.version}`;
   } catch (e) {
     /* backend not ready yet, ignore */
   }
 
   try {
     const update = await window.go.main.App.CheckForUpdates();
-    if (update.available) {
-      latestReleaseUrl = update.releaseUrl;
-      updateText.textContent = `Update available: v${update.latestVersion} (you're on v${update.currentVersion})`;
-      updateBanner.classList.remove("hidden");
-    }
+    applyUpdateInfo(update);
   } catch (e) {
     /* offline or GitHub unreachable, stay quiet */
   }
 }
+
+function applyUpdateInfo(update) {
+  latestUpdateInfo = update;
+  const show = update.available && update.assetAvailable;
+  aboutUpdateDot.classList.toggle("hidden", !show);
+  renderUpdateRows();
+}
+
+function renderUpdateRows() {
+  if (updateInProgress) return;
+  updateErrorText.classList.add("hidden");
+  updateProgressRow.classList.add("hidden");
+
+  if (latestUpdateInfo && latestUpdateInfo.available && latestUpdateInfo.assetAvailable) {
+    updateIdleRow.classList.add("hidden");
+    updateAvailableRow.classList.remove("hidden");
+    updateAvailableText.textContent = t(currentLang, "updateAvailable", {
+      latest: latestUpdateInfo.latestVersion,
+      current: latestUpdateInfo.currentVersion,
+    });
+  } else {
+    updateAvailableRow.classList.add("hidden");
+    updateIdleRow.classList.remove("hidden");
+    updateStatusText.textContent = t(currentLang, "upToDate");
+  }
+}
+
+function openAboutModal() {
+  aboutOverlay.classList.remove("hidden");
+  renderUpdateRows();
+}
+
+function closeAboutModal() {
+  aboutOverlay.classList.add("hidden");
+}
+
+aboutBtn.addEventListener("click", openAboutModal);
+aboutClose.addEventListener("click", closeAboutModal);
+aboutOverlay.addEventListener("click", (e) => {
+  if (e.target === aboutOverlay) closeAboutModal();
+});
 
 githubLinkBtn.addEventListener("click", async () => {
   try {
@@ -71,17 +203,65 @@ githubLinkBtn.addEventListener("click", async () => {
   }
 });
 
-updateViewBtn.addEventListener("click", async () => {
+aboutGithubLink.addEventListener("click", async () => {
   try {
-    await window.go.main.App.OpenReleasePage(latestReleaseUrl);
+    await window.go.main.App.OpenReleasePage(githubUrl);
   } catch (e) {
     /* ignore */
   }
 });
 
-updateDismissBtn.addEventListener("click", () => {
-  updateBanner.classList.add("hidden");
+checkUpdateBtn.addEventListener("click", async () => {
+  updateStatusText.textContent = t(currentLang, "checkingForUpdates");
+  try {
+    const update = await window.go.main.App.CheckForUpdates();
+    applyUpdateInfo(update);
+  } catch (e) {
+    updateStatusText.textContent = t(currentLang, "upToDate");
+  }
 });
+
+updateNowBtn.addEventListener("click", async () => {
+  updateInProgress = true;
+  updateAvailableRow.classList.add("hidden");
+  updateIdleRow.classList.add("hidden");
+  updateErrorText.classList.add("hidden");
+  updateProgressRow.classList.remove("hidden");
+  updateProgressLabel.textContent = t(currentLang, "downloadingUpdate");
+  updateProgressFill.style.width = "0%";
+  updateProgressPct.textContent = "0%";
+  updateProgressSpeed.textContent = "";
+
+  try {
+    await window.go.main.App.DownloadUpdate();
+    // On success the app quits itself to relaunch with the new version;
+    // if we're still here after a moment, something silently didn't
+    // trigger the restart, but there's nothing more to do from here.
+  } catch (e) {
+    updateInProgress = false;
+    updateProgressRow.classList.add("hidden");
+    updateErrorText.textContent = t(currentLang, "updateFailed", { error: String(e) });
+    updateErrorText.classList.remove("hidden");
+    renderUpdateRows();
+  }
+});
+
+if (window.runtime) {
+  window.runtime.EventsOn("update:progress", (p) => {
+    const pct = Math.max(0, Math.min(100, p.percent || 0));
+    updateProgressFill.style.width = pct.toFixed(0) + "%";
+    updateProgressPct.textContent = pct.toFixed(0) + "%";
+    if (p.bytesPerSecond > 0) {
+      updateProgressSpeed.textContent = t(currentLang, "speedPerSecond", {
+        speed: formatBytes(p.bytesPerSecond),
+      });
+    }
+  });
+  window.runtime.EventsOn("update:installing", () => {
+    updateProgressLabel.textContent = t(currentLang, "installingRestarting");
+    updateProgressSpeed.textContent = "";
+  });
+}
 
 initFooterAndUpdates();
 
@@ -109,6 +289,7 @@ const estimateQualityEl = document.getElementById("estimate-quality");
 let selectedPath = null;
 let outputDir = null;
 let lastOutputPath = null;
+let lastCompressResult = null;
 let currentVideoInfo = null;
 
 function formatBytes(bytes) {
@@ -174,11 +355,11 @@ function bppForCRF(crf) {
 }
 
 function qualityLabelForCRF(crf) {
-  if (crf <= 20) return "Excellent quality (near-lossless)";
-  if (crf <= 25) return "High quality";
-  if (crf <= 30) return "Good quality";
-  if (crf <= 35) return "Medium quality";
-  return "Low quality (visible artifacts)";
+  if (crf <= 20) return t(currentLang, "qualityExcellent");
+  if (crf <= 25) return t(currentLang, "qualityHigh");
+  if (crf <= 30) return t(currentLang, "qualityGood");
+  if (crf <= 35) return t(currentLang, "qualityMedium");
+  return t(currentLang, "qualityLow");
 }
 
 function updateEstimate() {
@@ -206,9 +387,9 @@ function updateEstimate() {
     ? (estimatedBytes / currentVideoInfo.sizeBytes) * 100
     : null;
 
-  let sizeText = `Estimated size: ~${formatBytes(estimatedBytes)}`;
+  let sizeText = `${t(currentLang, "estimateSizePrefix")} ~${formatBytes(estimatedBytes)}`;
   if (pctOfOriginal !== null) {
-    sizeText += ` (~${pctOfOriginal.toFixed(0)}% of original)`;
+    sizeText += ` (~${pctOfOriginal.toFixed(0)}% ${t(currentLang, "estimateOfOriginal")})`;
   }
   estimateSizeEl.textContent = sizeText;
   estimateQualityEl.textContent = qualityLabelForCRF(crf);
@@ -261,7 +442,7 @@ async function selectFile(path) {
     currentVideoInfo = info;
     const durationMin = Math.floor(info.durationSeconds / 60);
     const durationSec = Math.round(info.durationSeconds % 60);
-    dropText.textContent = "Selected:";
+    dropText.textContent = t(currentLang, "selectedLabel");
     fileInfo.textContent = `${info.name} — ${formatBytes(info.sizeBytes)} — ${info.width}x${info.height} — ${durationMin}m${durationSec}s — ${info.videoCodec}`;
     fileInfo.classList.remove("hidden");
     settings.classList.remove("hidden");
@@ -322,11 +503,10 @@ compressBtn.addEventListener("click", async () => {
   try {
     const result = await window.go.main.App.CompressVideo(opts);
     lastOutputPath = result.outputPath;
+    lastCompressResult = result;
     progressSection.classList.add("hidden");
     resultSection.classList.remove("hidden");
-    resultSummary.textContent =
-      `${formatBytes(result.inputSizeBytes)} -> ${formatBytes(result.outputSizeBytes)} ` +
-      `(${result.savedPercent.toFixed(1)}% smaller)`;
+    refreshResultSummary();
   } catch (e) {
     progressSection.classList.add("hidden");
     settings.classList.remove("hidden");
@@ -346,13 +526,23 @@ openFolderBtn.addEventListener("click", async () => {
 resetBtn.addEventListener("click", () => {
   selectedPath = null;
   lastOutputPath = null;
+  lastCompressResult = null;
   currentVideoInfo = null;
-  dropText.textContent = "Click to choose a video, or drag one here";
+  dropText.textContent = t(currentLang, "dropText");
   fileInfo.classList.add("hidden");
   settings.classList.add("hidden");
   resultSection.classList.add("hidden");
   clearError();
 });
+
+function refreshResultSummary() {
+  if (!lastCompressResult) return;
+  resultSummary.textContent = t(currentLang, "resultSummary", {
+    from: formatBytes(lastCompressResult.inputSizeBytes),
+    to: formatBytes(lastCompressResult.outputSizeBytes),
+    pct: lastCompressResult.savedPercent.toFixed(1),
+  });
+}
 
 if (window.runtime) {
   window.runtime.EventsOn("compress:progress", (pct) => {
@@ -361,3 +551,5 @@ if (window.runtime) {
     progressText.textContent = clamped.toFixed(0) + "%";
   });
 }
+
+initLanguage();
